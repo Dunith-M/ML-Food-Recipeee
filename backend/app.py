@@ -4,7 +4,6 @@ import requests
 import os
 from dotenv import load_dotenv  
 
-
 app = Flask(__name__)
 CORS(app)  # ✨ Enable CORS for all routes
 load_dotenv()
@@ -60,6 +59,51 @@ def get_recipes():
         })
 
     return jsonify(results)
+
+# ✅ New endpoint: get full recipe details and compare with fridge items
+@app.route("/get-recipe/<int:recipe_id>", methods=["POST"])
+def get_recipe_details(recipe_id):
+    data = request.get_json()
+    fridge_items = data.get("fridge", [])  # user’s fridge items from frontend
+
+    # Call Spoonacular API for full recipe info
+    url = f"https://api.spoonacular.com/recipes/{recipe_id}/information"
+    params = {"apiKey": API_KEY}
+
+    try:
+        response = requests.get(url, params=params)
+        response.raise_for_status()
+        recipe = response.json()
+    except requests.exceptions.RequestException as e:
+        return jsonify({"error": str(e)}), 500
+
+    # Normalize fridge items
+    fridge_items_normalized = [f.lower().strip() for f in fridge_items]
+
+    # Extract recipe ingredients
+    all_ingredients = [i["name"].lower().strip() for i in recipe.get("extendedIngredients", [])]
+
+    # Compare with fridge
+    available = []
+    missing = []
+    for ing in all_ingredients:
+        if ing in fridge_items_normalized:
+            available.append(ing)
+        else:
+            missing.append(ing)
+
+    # Build response
+    result = {
+        "id": recipe["id"],
+        "title": recipe["title"],
+        "image": recipe.get("image"),
+        "ingredients": all_ingredients,
+        "availableIngredients": available,
+        "missingIngredients": missing,
+        "steps": [s["step"] for a in recipe.get("analyzedInstructions", []) for s in a.get("steps", [])]
+    }
+
+    return jsonify(result)
 
 if __name__ == "__main__":
     app.run(debug=True, port=5000)

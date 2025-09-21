@@ -1,42 +1,50 @@
-// ✨ frontend/src/pages/RecipeDetails.jsx
 import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
+import axios from "axios"; // ✨ Added for API calls
 
 const RecipeDetails = () => {
   const { id } = useParams(); // get recipe id from URL
   const [recipe, setRecipe] = useState(null);
+  const [loading, setLoading] = useState(false); // ✨ Added loading state
+  const [error, setError] = useState(null); // ✨ Added error state
 
   useEffect(() => {
-    // later connect with backend using fetch/axios
-    // temporary mock data
-    const mockRecipe = {
-      name: "Spaghetti Bolognese",
-      ingredients: ["spaghetti", "beef", "tomato", "onion", "garlic"],
-      missingIngredients: ["beef"],
-      steps: [
-        "Boil spaghetti.",
-        "Cook beef with onion & garlic.",
-        "Add tomato sauce.",
-        "Mix with spaghetti and serve."
-      ],
-      image:
-        "https://www.themealdb.com/images/media/meals/sutysw1468247559.jpg"
+    const loadRecipe = async () => {
+      setLoading(true);
+      setError(null);
+
+      try {
+        // ❌ Removed mock data
+        // ✅ Added real API call to backend
+        const fridgeItems = JSON.parse(localStorage.getItem("fridge_ingredients")) || [];
+        const res = await axios.post(`http://127.0.0.1:5000/get-recipe/${id}`, {
+          fridge: fridgeItems,
+        });
+        setRecipe(res.data);
+      } catch (err) {
+        setError(err.response?.data?.error || err.message || "Unknown error");
+      } finally {
+        setLoading(false);
+      }
     };
-    setRecipe(mockRecipe);
+
+    loadRecipe();
   }, [id]);
 
-  if (!recipe) return <p className="text-center">Loading...</p>;
+  if (loading) return <p className="text-center">Loading recipe... 🍳</p>;
+  if (error) return <p className="text-center text-red-600">Error: {error} ❌</p>;
+  if (!recipe) return <p className="text-center">No recipe found ❌</p>;
 
   return (
     <div className="p-6 max-w-3xl mx-auto">
       {/* Recipe Title */}
-      <h1 className="text-3xl font-bold mb-4">{recipe.name}</h1>
+      <h1 className="text-3xl font-bold mb-4">{recipe.title}</h1> {/* ✨ Changed from recipe.name to recipe.title */}
 
       {/* Image */}
       {recipe.image && (
         <img
           src={recipe.image}
-          alt={recipe.name}
+          alt={recipe.title}
           className="w-full h-64 object-cover rounded-lg shadow mb-6"
         />
       )}
@@ -48,7 +56,7 @@ const RecipeDetails = () => {
           <li
             key={i}
             className={
-              recipe.missingIngredients.includes(ing)
+              recipe.missingIngredients.includes(ing) // ✨ use missingIngredients from backend
                 ? "text-red-600 font-bold"
                 : "text-gray-800"
             }
@@ -70,6 +78,4 @@ const RecipeDetails = () => {
 };
 
 export default RecipeDetails;
-
-
 
