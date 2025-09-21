@@ -5,7 +5,7 @@ import os
 from dotenv import load_dotenv  
 
 app = Flask(__name__)
-CORS(app)  # ✨ Enable CORS for all routes
+CORS(app)  #  Enable CORS for all routes
 load_dotenv()
 # Load Spoonacular API key from environment variable
 API_KEY = os.environ.get("SPOONACULAR_API_KEY")  
