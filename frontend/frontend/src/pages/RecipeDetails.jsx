@@ -1,12 +1,12 @@
 import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
-import axios from "axios"; // ✨ Added for API calls
+import axios from "axios"; //  Added for API calls
 
 const RecipeDetails = () => {
   const { id } = useParams(); // get recipe id from URL
   const [recipe, setRecipe] = useState(null);
-  const [loading, setLoading] = useState(false); // ✨ Added loading state
-  const [error, setError] = useState(null); // ✨ Added error state
+  const [loading, setLoading] = useState(false); //  Added loading state
+  const [error, setError] = useState(null); //  Added error state
 
   useEffect(() => {
     const loadRecipe = async () => {
@@ -38,7 +38,7 @@ const RecipeDetails = () => {
   return (
     <div className="p-6 max-w-3xl mx-auto">
       {/* Recipe Title */}
-      <h1 className="text-3xl font-bold mb-4">{recipe.title}</h1> {/* ✨ Changed from recipe.name to recipe.title */}
+      <h1 className="text-3xl font-bold mb-4">{recipe.title}</h1> {/* Changed from recipe.name to recipe.title */}
 
       {/* Image */}
       {recipe.image && (
@@ -56,7 +56,7 @@ const RecipeDetails = () => {
           <li
             key={i}
             className={
-              recipe.missingIngredients.includes(ing) // ✨ use missingIngredients from backend
+              recipe.missingIngredients.includes(ing) // use missingIngredients from backend
                 ? "text-red-600 font-bold"
                 : "text-gray-800"
             }
