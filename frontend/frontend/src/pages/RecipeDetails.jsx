@@ -1,12 +1,13 @@
+// ✨ frontend/src/pages/RecipeDetails.jsx
 import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
-import axios from "axios"; //  Added for API calls
+import axios from "axios"; // ✨ Added axios import for API call
 
 const RecipeDetails = () => {
   const { id } = useParams(); // get recipe id from URL
   const [recipe, setRecipe] = useState(null);
-  const [loading, setLoading] = useState(false); //  Added loading state
-  const [error, setError] = useState(null); //  Added error state
+  const [loading, setLoading] = useState(false); // ✨ loading state
+  const [error, setError] = useState(null); // ✨ error state
 
   useEffect(() => {
     const loadRecipe = async () => {
@@ -14,12 +15,14 @@ const RecipeDetails = () => {
       setError(null);
 
       try {
-        // ❌ Removed mock data
-        // ✅ Added real API call to backend
+        // Get fridge items from localStorage
         const fridgeItems = JSON.parse(localStorage.getItem("fridge_ingredients")) || [];
+
+        // Call backend to get recipe details + missing/available ingredients
         const res = await axios.post(`http://127.0.0.1:5000/get-recipe/${id}`, {
-          fridge: fridgeItems,
+          fridge: fridgeItems, // ✨ sending user's fridge items
         });
+
         setRecipe(res.data);
       } catch (err) {
         setError(err.response?.data?.error || err.message || "Unknown error");
@@ -35,10 +38,20 @@ const RecipeDetails = () => {
   if (error) return <p className="text-center text-red-600">Error: {error} ❌</p>;
   if (!recipe) return <p className="text-center">No recipe found ❌</p>;
 
+  // ✨ Prepare missing ingredients display
+  const missingDisplay =
+    recipe.missingIngredients.length === 0
+      ? "You have everything for this recipe! ✅"
+      : recipe.missingIngredients.length > 10
+      ? `${recipe.missingIngredients.slice(0, 10).join(", ")} and ${
+          recipe.missingIngredients.length - 10
+        } more...`
+      : recipe.missingIngredients.join(", ");
+
   return (
     <div className="p-6 max-w-3xl mx-auto">
       {/* Recipe Title */}
-      <h1 className="text-3xl font-bold mb-4">{recipe.title}</h1> {/* Changed from recipe.name to recipe.title */}
+      <h1 className="text-3xl font-bold mb-4">{recipe.title}</h1>
 
       {/* Image */}
       {recipe.image && (
@@ -49,14 +62,30 @@ const RecipeDetails = () => {
         />
       )}
 
-      {/* Ingredients */}
+      {/* ✨ New Section: Missing Ingredients */}
+      <div className="mb-4 p-4 border rounded bg-red-50">
+        <span className="font-semibold">You are missing: </span>
+        <span className="text-red-600 font-bold">{missingDisplay}</span>
+      </div>
+
+      {/* Optional: Available Ingredients */}
+      {recipe.availableIngredients && recipe.availableIngredients.length > 0 && (
+        <div className="mb-6 p-4 border rounded bg-green-50">
+          <span className="font-semibold">You have: </span>
+          <span className="text-green-600 font-bold">
+            {recipe.availableIngredients.join(", ")}
+          </span>
+        </div>
+      )}
+
+      {/* Ingredients List */}
       <h2 className="text-xl font-semibold mb-2">Ingredients</h2>
       <ul className="mb-6 list-disc list-inside">
         {recipe.ingredients.map((ing, i) => (
           <li
             key={i}
             className={
-              recipe.missingIngredients.includes(ing) // use missingIngredients from backend
+              recipe.missingIngredients.includes(ing)
                 ? "text-red-600 font-bold"
                 : "text-gray-800"
             }
@@ -78,4 +107,3 @@ const RecipeDetails = () => {
 };
 
 export default RecipeDetails;
-
