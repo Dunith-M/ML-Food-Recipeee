@@ -3,6 +3,7 @@ from flask_cors import CORS  # allows frontend to call backend
 import requests
 import os
 from dotenv import load_dotenv  
+from utils.spoonacular import get_grocery_options 
 
 app = Flask(__name__)
 CORS(app)  #  Enable CORS for all routes
@@ -104,6 +105,27 @@ def get_recipe_details(recipe_id):
     }
 
     return jsonify(result)
+
+
+
+@app.route("/get-grocery", methods=["POST"])
+def get_grocery():
+    """
+    Expects JSON: { "ingredients": ["carrot", "onion"] }
+    Returns: grocery suggestions from Spoonacular
+    """
+    data = request.json
+    ingredients = data.get("ingredients", [])
+    response_data = []
+
+    for ing in ingredients:
+        options = get_grocery_options(ing)
+        response_data.append({
+            "ingredient": ing,
+            "options": options
+        })
+
+    return jsonify(response_data), 200
 
 if __name__ == "__main__":
     app.run(debug=True, port=5000)
