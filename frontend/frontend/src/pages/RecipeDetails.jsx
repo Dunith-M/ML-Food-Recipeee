@@ -42,9 +42,9 @@ const RecipeDetails = () => {
   const missingDisplay =
     recipe.missingIngredients.length === 0
       ? "You have everything for this recipe! ✅"
-      : recipe.missingIngredients.length > 10
-      ? `${recipe.missingIngredients.slice(0, 10).join(", ")} and ${
-          recipe.missingIngredients.length - 10
+      : recipe.missingIngredients.length > 20
+      ? `${recipe.missingIngredients.slice(0, 20).join(", ")} and ${
+          recipe.missingIngredients.length - 20
         } more...`
       : recipe.missingIngredients.join(", ");
 
