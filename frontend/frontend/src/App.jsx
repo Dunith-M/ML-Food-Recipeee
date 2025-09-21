@@ -4,6 +4,7 @@ import Home from "./pages/Home"
 import FridgeInput from "./pages/FridgeInput"
 import Recipes from "./pages/Recipes"
 import Grocery from "./pages/Grocery"
+import RecipeDetails from "./pages/RecipeDetails"; 
 import './App.css'
 
 export default function App() {
@@ -16,6 +17,7 @@ export default function App() {
         <Link to="/fridge" className="hover:underline">Fridge Input</Link>
         <Link to="/recipes" className="hover:underline">Recipes</Link>
         <Link to="/grocery" className="hover:underline">Grocery</Link>
+        
       </nav>
 
       
@@ -26,6 +28,7 @@ export default function App() {
           <Route path="/fridge" element={<FridgeInput />} />
           <Route path="/recipes" element={<Recipes />} />
           <Route path="/grocery" element={<Grocery />} />
+          <Route path="/recipes/:id" element={<RecipeDetails />} />
         </Routes>
       </div>
     </div>

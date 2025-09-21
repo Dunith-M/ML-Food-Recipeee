@@ -47,7 +47,11 @@ const Recipes = () => {
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           {recipes.map((r) => (
-            <div key={r.id} className="border rounded-lg p-4 shadow-sm">
+            <div
+              key={r.id}
+              className="border rounded-lg p-4 shadow-sm cursor-pointer hover:bg-gray-50" // ✏️ added cursor + hover
+              onClick={() => navigate(`/recipes/${r.id}`)} // ✨ NEW: navigate to RecipeDetails
+            >
               {r.image ? (
                 <img
                   src={r.image}
@@ -68,21 +72,8 @@ const Recipes = () => {
                 ❌ Missing: {r.missedIngredients.join(", ") || "None"}
               </p>
 
-              <div className="mt-3 flex justify-end">
-                <button
-                  onClick={() =>
-                    window.open(
-                      `https://spoonacular.com/recipes/${r.title
-                        .replace(/\s+/g, "-")
-                        .toLowerCase()}-${r.id}`,
-                      "_blank"
-                    )
-                  }
-                  className="px-3 py-1 bg-green-600 text-white rounded"
-                >
-                  View Recipe
-                </button>
-              </div>
+              {/* ❌ Removed old "View Recipe" button that opened external site */}
+              {/* Instead, entire card is now clickable */}
             </div>
           ))}
         </div>
