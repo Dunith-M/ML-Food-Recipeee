@@ -119,7 +119,7 @@ def get_grocery():
     response_data = []
 
     for ing in ingredients:
-        options = get_grocery_options(ing)
+        options = get_grocery_options(ing, number=3)
         response_data.append({
             "ingredient": ing,
             "options": options

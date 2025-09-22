@@ -1,5 +1,6 @@
 # backend/utils/spoonacular.py
 import os
+import random
 import requests
 from dotenv import load_dotenv
 
@@ -10,30 +11,34 @@ BASE_URL = "https://api.spoonacular.com/food/ingredients/search"
 
 def get_grocery_options(ingredient, number=3):
     """
-    Fetch grocery options for a given ingredient from Spoonacular.
-    Returns a list of dictionaries: [{name, price (mock), link}, ...]
+    Fetch grocery options for a given ingredient.
+    Combines Spoonacular validation + mock shop data.
     """
     try:
-        params = {
-            "query": ingredient,
-            "number": number,
-            "apiKey": API_KEY
-        }
+        params = {"query": ingredient, "number": 1, "apiKey": API_KEY}
         response = requests.get(BASE_URL, params=params)
         data = response.json()
-        results = []
 
-        if "results" in data:
-            for item in data["results"]:
-                results.append({
-                    "name": item.get("name"),
-                    "price": round(item.get("estimatedCost", {}).get("value", 100) * 100),  # mock price
-                    "link": f"https://spoonacular.com/ingredients/{item.get('name').replace(' ', '-')}-ingredient"  # example link
-                })
-        else:
-            results.append({"name": ingredient, "price": None, "link": None})
+        if "results" not in data or not data["results"]:
+            return [{"shop": "No local option available", "price": None, "link": None}]
 
-        return results
+        # ✅ Get ingredient name + image from Spoonacular
+        item = data["results"][0]
+        ing_name = item.get("name")
+        ing_image = f"https://spoonacular.com/cdn/ingredients_100x100/{item.get('image')}" if item.get("image") else None
+
+        # ✅ Mock shop options
+        shops = ["Keells", "Cargills", "Laughs"]
+        options = []
+        for shop in shops[:number]:
+            options.append({
+                "shop": shop,
+                "price": random.randint(150, 500),  # mock price
+                "link": f"https://{shop.lower()}.lk/search?q={ing_name.replace(' ', '+')}",
+                "image": ing_image
+            })
+
+        return options
     except Exception as e:
         print("Error fetching from Spoonacular:", e)
-        return [{"name": ingredient, "price": None, "link": None}]
+        return [{"shop": "Error fetching data", "price": None, "link": None}]
