@@ -28,7 +28,7 @@ def get_grocery_options(ingredient, number=3):
         ing_image = f"https://spoonacular.com/cdn/ingredients_100x100/{item.get('image')}" if item.get("image") else None
 
         # ✅ Mock shop options
-        shops = ["Keells", "Cargills", "Laughs"]
+        shops = ["Keellssuper", "cargills", "Laughs"]
         options = []
         for shop in shops[:number]:
             options.append({
