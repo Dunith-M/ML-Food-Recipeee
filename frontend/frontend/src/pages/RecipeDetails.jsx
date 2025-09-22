@@ -1,6 +1,6 @@
 // ✨ frontend/src/pages/RecipeDetails.jsx
 import React, { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import axios from "axios"; // ✨ Added axios import for API call
 
 const RecipeDetails = () => {
@@ -9,6 +9,8 @@ const RecipeDetails = () => {
   const [loading, setLoading] = useState(false); // ✨ loading state
   const [error, setError] = useState(null); // ✨ error state
 
+  const navigate = useNavigate();
+
   useEffect(() => {
     const loadRecipe = async () => {
       setLoading(true);
@@ -16,7 +18,8 @@ const RecipeDetails = () => {
 
       try {
         // Get fridge items from localStorage
-        const fridgeItems = JSON.parse(localStorage.getItem("fridge_ingredients")) || [];
+        const fridgeItems =
+          JSON.parse(localStorage.getItem("fridge_ingredients")) || [];
 
         // Call backend to get recipe details + missing/available ingredients
         const res = await axios.post(`http://127.0.0.1:5000/get-recipe/${id}`, {
@@ -35,7 +38,8 @@ const RecipeDetails = () => {
   }, [id]);
 
   if (loading) return <p className="text-center">Loading recipe... 🍳</p>;
-  if (error) return <p className="text-center text-red-600">Error: {error} ❌</p>;
+  if (error)
+    return <p className="text-center text-red-600">Error: {error} ❌</p>;
   if (!recipe) return <p className="text-center">No recipe found ❌</p>;
 
   // ✨ Prepare missing ingredients display
@@ -47,6 +51,12 @@ const RecipeDetails = () => {
           recipe.missingIngredients.length - 20
         } more...`
       : recipe.missingIngredients.join(", ");
+  // ✨ Function to handle navigating to Grocery Suggestions Page
+  const handleViewGrocery = () => {
+    navigate("/grocery", {
+      state: { missingIngredients: recipe.missingIngredients },
+    });
+  };
 
   return (
     <div className="p-6 max-w-3xl mx-auto">
@@ -68,15 +78,25 @@ const RecipeDetails = () => {
         <span className="text-red-600 font-bold">{missingDisplay}</span>
       </div>
 
-      {/* Optional: Available Ingredients */}
-      {recipe.availableIngredients && recipe.availableIngredients.length > 0 && (
-        <div className="mb-6 p-4 border rounded bg-green-50">
-          <span className="font-semibold">You have: </span>
-          <span className="text-green-600 font-bold">
-            {recipe.availableIngredients.join(", ")}
-          </span>
-        </div>
+      {recipe.missingIngredients.length > 0 && (
+        <button
+          onClick={handleViewGrocery}
+          className="bg-blue-500 text-white px-4 py-2 rounded-lg mt-4 hover:bg-blue-600"
+        >
+          View Grocery Suggestions
+        </button>
       )}
+
+      {/* Optional: Available Ingredients */}
+      {recipe.availableIngredients &&
+        recipe.availableIngredients.length > 0 && (
+          <div className="mb-6 p-4 border rounded bg-green-50">
+            <span className="font-semibold">You have: </span>
+            <span className="text-green-600 font-bold">
+              {recipe.availableIngredients.join(", ")}
+            </span>
+          </div>
+        )}
 
       {/* Ingredients List */}
       <h2 className="text-xl font-semibold mb-2">Ingredients</h2>
