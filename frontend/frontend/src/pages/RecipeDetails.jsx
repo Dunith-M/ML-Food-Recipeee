@@ -55,6 +55,7 @@ const RecipeDetails = () => {
   const handleViewGrocery = () => {
     navigate("/grocery", {
       state: { missingIngredients: recipe.missingIngredients },
+      recipeTitle: recipe.title // ✅ send recipe context
     });
   };
 

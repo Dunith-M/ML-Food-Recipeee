@@ -5,7 +5,8 @@ import axios from "axios";
 
 const Grocery = () => {
   const location = useLocation();
-  const { missingIngredients = [] } = location.state || {}; // ✅ comes from RecipeDetails
+  // ✅ Get missingIngredients + recipeTitle from RecipeDetails page
+  const { missingIngredients = [], recipeTitle = "" } = location.state || {};
   const [groceryData, setGroceryData] = useState([]);
   const [loading, setLoading] = useState(true);
 
@@ -42,9 +43,11 @@ const Grocery = () => {
         <div className="space-y-6">
           {groceryData.map((item, idx) => (
             <div key={idx} className="bg-white p-4 rounded-2xl shadow-md">
+              {/* ✅ Show ingredient + recipe context */}
               <h2 className="text-xl font-semibold mb-3">
                 Missing Ingredient:{" "}
-                <span className="text-red-500">{item.ingredient}</span>
+                <span className="text-red-500">{item.ingredient}</span>{" "}
+                {recipeTitle && <span className="text-gray-500">(Needed for {recipeTitle})</span>}
               </h2>
 
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
