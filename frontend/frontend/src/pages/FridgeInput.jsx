@@ -1,11 +1,13 @@
 //  frontend/src/pages/FridgeInput.jsx
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { uploadFridgeImage } from "../storage/api";
 
 const FridgeInput = () => {
   const [ingredients, setIngredients] = useState(""); //  Manual typing
   const [image, setImage] = useState(null); //  Store uploaded image
   const [preview, setPreview] = useState(null); //  For showing preview
+  const [loading, setLoading] = useState(false); //  track upload state
   const navigate = useNavigate();
 
   // Handle manual typing
@@ -36,15 +38,33 @@ const FridgeInput = () => {
     }
   };
 
-  // Placeholder for Detect Ingredients button (backend integration later)
-  const handleDetectIngredients = () => {
+  
+
+   //  Handle image upload to backend
+  const handleDetectIngredients = async () => {
     if (!image) {
       alert("Please upload an image first!");
       return;
     }
-    alert("🚀 Image ready for detection (backend integration coming soon)");
-    // TODO: send image to Flask backend via API
+
+    try {
+      setLoading(true); //  Show loading state
+      const response = await uploadFridgeImage(image); //  Upload to backend
+
+      if (response.data.success) {
+        alert(`✅ ${response.data.message}\nFile: ${response.data.filename}`);
+        //  You can later trigger YOLO detection or auto-fetch recipes here
+      } else {
+        alert(`⚠️ Upload failed: ${response.data.message}`);
+      }
+    } catch (error) {
+      console.error("Image upload error:", error);
+      alert("❌ Error uploading image. Please try again.");
+    } finally {
+      setLoading(false); //  Reset loading state
+    }
   };
+
 
   return (
     <div className="max-w-2xl mx-auto mt-10 p-6 bg-white shadow rounded">
