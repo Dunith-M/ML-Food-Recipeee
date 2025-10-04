@@ -5,11 +5,17 @@ import os
 from dotenv import load_dotenv  
 from utils.spoonacular import get_grocery_options 
 
+# Import routes 👁️
+from routes.image_routes import image_bp
+
 app = Flask(__name__)
 CORS(app)  #  Enable CORS for all routes
 load_dotenv()
 # Load Spoonacular API key from environment variable
 API_KEY = os.environ.get("SPOONACULAR_API_KEY")  
+
+# Register blueprints 👁️
+app.register_blueprint(image_bp)
 
 @app.route("/")
 def test():
