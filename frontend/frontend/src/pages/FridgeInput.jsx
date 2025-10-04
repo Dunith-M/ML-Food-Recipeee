@@ -120,10 +120,13 @@ const FridgeInput = () => {
 
       {/* Detect Ingredients Button */}
       <button
-        className="w-full mt-6 bg-green-600 text-white py-2 rounded hover:bg-green-700 transition"
+        className={`w-full mt-6 text-white py-2 rounded transition ${
+          loading ? "bg-gray-400" : "bg-green-600 hover:bg-green-700"
+        }`}
         onClick={handleDetectIngredients}
+        disabled={loading} // ✨ Disable while uploading
       >
-        Detect Ingredients
+        {loading ? "Uploading..." : "Detect Ingredients"} {/* ✨ Dynamic text */}
       </button>
     </div>
   );
